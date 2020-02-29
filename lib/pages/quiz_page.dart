@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz/qu.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class QuizPage extends StatefulWidget {
   QuizPage({Key key}) : super(key: key);
@@ -17,17 +18,51 @@ class _QuizPageState extends State<QuizPage> {
   int wrongAnswer = 0;
   int quIndex = 0;
   bool quizCompleted = false;
+ int score = 0;
 
-  void nextQuestion(bool answer){
+
+void showMsg(context){
+  Alert(
+      context: context,
+      title: "Quiz Finish",
+      desc: "Your score is ${score}",
+      type: AlertType.success,
+      buttons: [
+        DialogButton(
+          child: Text("reset"),
+          onPressed: (){
+            setState(() {
+              correctAnswer = 0 ;
+              wrongAnswer = 0;
+              score =0 ;
+              quIndex = 0;
+              quizCompleted = false;
+            });
+            Navigator.of(context).pop();
+          },
+        )
+      ]
+  ).show();
+}
+
+  void nextQuestion(bool answer,context){
     setState(() {
       if(!quizCompleted){
         if(qu[quIndex].answer == answer){
        correctAnswer++;
+       score+=10;
         }else{
           wrongAnswer++;
         }
       }
-      quIndex < qu.length -1 ? quIndex++ :  quizCompleted = true;
+
+       if(quIndex < qu.length -1){
+          quIndex++;
+       }else{
+         quizCompleted = true;
+         showMsg(context);
+      }
+
     });
   }
   @override
@@ -65,7 +100,7 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   child: RaisedButton(
                     onPressed: (){
-                      nextQuestion(true);
+                      nextQuestion(true,context);
                     },
                     child: Text(
                       "True",
@@ -93,7 +128,7 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   child: RaisedButton(
                     onPressed: (){
-                      nextQuestion(false);
+                      nextQuestion(false,context);
                     },
                     child: Text(
                       "False",
@@ -101,8 +136,6 @@ class _QuizPageState extends State<QuizPage> {
                           fontSize: 32,
                           color: Colors.white
                       ),
-
-
                     ),
                   ),
                 ),
